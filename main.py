@@ -1,14 +1,27 @@
-import numpy as np 
+import numpy as np
+import pandas as pd
 from neuron import DenseLayer
+from NeuralNet import NeuralNet
 
-inputs = np.array([[1, 2, 3, 2.5], [2.0, 5.0, -1.0, 2.0], [-1.5, 2.7, 3.3, -0.8]])
+data = pd.read_csv('./train.csv')
+data = np.array(data)
+m, n = data.shape
+np.random.shuffle(data)
 
-layer1 = DenseLayer(4, 5)
-layer2 = DenseLayer(5, 3)
+data_dev = data[0:1000].T
+Y_dev = data_dev[0]
+X_dev = data_dev[1:n]
+X_dev = X_dev / 255.
 
-layer1.forwardProp(inputs)
-layer2.forwardProp(layer1.output)
-print(layer2.output)
+data_train = data[1000:m].T
+Y_train = data_train[0]
+X_train = data_train[1:n]
+X_train = X_train / 255.
+_, m_train = X_train.shape
+
+nn = NeuralNet()
+print(nn.fit(X_train, Y_train))
+
 
 ''' Old Single Layer Code
 weights = np.array([[0.2, 0.8, -0.5, 1.0], [0.5, -0.91, 0.26, -0.5], [-0.26, -0.27, 0.17, 0.87]])
