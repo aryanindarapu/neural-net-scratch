@@ -16,11 +16,16 @@ X_dev = X_dev / 255.
 data_train = data[1000:m].T
 Y_train = data_train[0]
 X_train = data_train[1:n]
-X_train = X_train / 255.
+X_train = X_train / 255.0
 _, m_train = X_train.shape
 
-nn = NeuralNet()
+nn = NeuralNet(learningRate=0.01, totalIter=200)
 print(nn.fit(X_train, Y_train))
+nn.testPredict(0, X_dev, Y_dev)
+nn.testPredict(1, X_dev, Y_dev)
+nn.testPredict(2, X_dev, Y_dev)
+nn.testPredict(3, X_dev, Y_dev)
+nn.testPredict(4, X_dev, Y_dev)
 
 
 ''' Old Single Layer Code
