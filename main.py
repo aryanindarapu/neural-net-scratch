@@ -1,31 +1,29 @@
 import numpy as np
 import pandas as pd
-from neuron import DenseLayer
 from NeuralNet import NeuralNet
 
-data = pd.read_csv('./train.csv')
-data = np.array(data)
-m, n = data.shape
-np.random.shuffle(data)
+imageData = pd.read_csv('./train.csv')
+imageData = np.array(imageData)
+np.random.shuffle(imageData)
 
-data_dev = data[0:1000].T
-Y_dev = data_dev[0]
-X_dev = data_dev[1:n]
-X_dev = X_dev / 255.
+imageData_train = imageData[1000:imageData.shape[0]].T
+xTrain = imageData_train[1:imageData.shape[1]] / 255.0
+yTrain = imageData_train[0]
 
-data_train = data[1000:m].T
-Y_train = data_train[0]
-X_train = data_train[1:n]
-X_train = X_train / 255.0
-_, m_train = X_train.shape
+imageData_test = imageData[0:1000].T
+xTest = imageData_test[1:imageData.shape[1]] / 255.0
+yTest = imageData_test[0]
 
-nn = NeuralNet(learningRate=0.01, totalIter=200)
-print(nn.fit(X_train, Y_train))
-nn.testPredict(0, X_dev, Y_dev)
-nn.testPredict(1, X_dev, Y_dev)
-nn.testPredict(2, X_dev, Y_dev)
-nn.testPredict(3, X_dev, Y_dev)
-nn.testPredict(4, X_dev, Y_dev)
+network = NeuralNet(learningRate=0.01, totalIter=200)
+network.fit(xTrain, yTrain)
+network.testPredict(0, xTest, yTest)
+network.testPredict(1, xTest, yTest)
+network.testPredict(2, xTest, yTest)
+network.testPredict(3, xTest, yTest)
+network.testPredict(4, xTest, yTest)
+
+network.predict(xTest, yTest)
+print("Output", network.output)
 
 
 ''' Old Single Layer Code

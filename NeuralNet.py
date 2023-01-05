@@ -36,25 +36,16 @@ class NeuralNet:
         X[X > 0] = 1
         return X    
         
-    def sigmoid(self, X):
-        return 1 / (1 + np.exp(-X))
-    
-    # def dSigmoid()
-    
     def softmax(self, X):
         A = np.exp(X) / sum(np.exp(X))
         return A
     
-    # def rmsLoss(self, output, givenOutput):
-    #     result = output - givenOutput
-    #     return np.sqrt(result.T )
-    
-    def crossentropyLoss(self, output, givenOutput):
-        # works around np.log(0) errors
-        output = np.maximum(output, 0.0000000001)
-        givenOutput = np.maximum(givenOutput, 0.0000000001)
+    # def crossentropyLoss(self, output, givenOutput):
+    #     # works around np.log(0) errors
+    #     output = np.maximum(output, 0.0000000001)
+    #     givenOutput = np.maximum(givenOutput, 0.0000000001)
         
-        return -1 / len(givenOutput) * (np.sum(np.multiply(np.log(output), givenOutput) + np.multiply((1.0 - givenOutput), np.log(1.0 - output))))
+    #     return -1 / len(givenOutput) * (np.sum(np.multiply(np.log(output), givenOutput) + np.multiply((1.0 - givenOutput), np.log(1.0 - output))))
 
     def forwardProp(self):
         Z1 = np.dot(self.W1, self.input) + self.b1
@@ -68,18 +59,15 @@ class NeuralNet:
         
         
     def backwardProp(self, Z1, A1, Z2):
-        # '''
-        one_hot_Y = np.zeros((self.givenOutput.size, self.givenOutput.max() + 1))
-        one_hot_Y[np.arange(self.givenOutput.size), self.givenOutput] = 1
-        one_hot_Y = one_hot_Y.T
+        oneHot = np.zeros((self.givenOutput.size, self.givenOutput.max() + 1))
+        oneHot[np.arange(self.givenOutput.size), self.givenOutput] = 1
         
-        dZ2 = self.output - one_hot_Y
+        dZ2 = self.output - oneHot.T
         dW2 = (1 / len(self.input)) * np.dot(dZ2, A1.T)
         db2 = (1 / len(self.input)) * np.sum(dZ2, axis=1, keepdims=True)
         dZ1 = np.dot(self.W2.T, dZ2) * self.dRelu(Z1)
         dW1 = (1 / len(self.input)) * np.dot(dZ1, self.input.T)
         db1 = (1 / len(self.input)) * np.sum(dZ1, axis=1, keepdims=True)
-        # '''
         
         # Updating weights and biases
         self.W1 = self.W1 - self.learningRate * dW1
@@ -87,9 +75,8 @@ class NeuralNet:
         self.b1 = self.b1 - self.learningRate * db1
         self.b2 = self.b2 - self.learningRate * db2
         
-    def getAccuracy(self, output):
-        print(output, self.givenOutput)
-        return np.sum(output == self.givenOutput) / self.givenOutput.size
+    def getAccuracy(self):
+        return np.sum(self.output == self.givenOutput) / self.givenOutput.size
         
     def fit(self, input, givenOutput, randSeed=14351):
         self.input = input
@@ -102,9 +89,10 @@ class NeuralNet:
             # self.loss.append(loss)
             if i % 10 == 0:
                 print("Iteration: ", i)
-                pred = np.argmax(self.output, 0)
-                print(self.getAccuracy(pred))
-            
+                self.output = np.argmax(self.output, 0)
+                print(self.getAccuracy())
+        
+        print(f"Training Accuracy: {self.getAccuracy()}")
         return self.output
         
     def predict(self, input, output):
@@ -112,6 +100,7 @@ class NeuralNet:
         self.givenOutput = output
         self.forwardProp()
         self.output = np.argmax(self.output, 0)
+        print(f"Test Accuracy: {self.getAccuracy()}")
 
     def testPredict(self, idx, input, output):
         self.input = input[:, idx, None]        
@@ -119,9 +108,4 @@ class NeuralNet:
         self.forwardProp()
         print("Prediction: ", np.argmax(self.output, 0))
         print("Label: ", output[idx])
-        
-        currOut = currOut.reshape((28, 28)) * 255
-        plt.gray()
-        plt.imshow(currOut, interpolation='nearest')
-        plt.show()
         
